@@ -1,5 +1,6 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
+  "license": "0BSD",
+  "main": "index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -7,18 +8,18 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~46.0.17",
-    "expo-status-bar": "~1.4.0",
-    "react": "18.0.0",
-    "react-native": "0.69.6",
-    "expo-sqlite": "~10.3.0",
-    "expo-constants": "~13.2.4",
+    "expo": "~52.0.26",
+    "expo-status-bar": "~2.0.1",
+    "react": "18.3.1",
+    "react-native": "0.76.6",
+    "expo-constants": "~17.0.4",
     "lodash.debounce": "*",
-    "@expo/vector-icons": "^13.0.0",
-    "react-native-paper": "4.9.2"
+    "@expo/vector-icons": "^14.0.2",
+    "react-native-paper": "4.9.2",
+    "expo-sqlite": "~15.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.20.0"
   },
   "private": true
 }

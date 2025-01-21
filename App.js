@@ -17,7 +17,7 @@ import {
   filterByQueryAndCategories,
 } from './database';
 import Filters from './components/Filters';
-import { getSectionListData, useUpdateEffect } from './utils';
+import { getSectionListData, useUpdateEffect, SECTION_LIST_MOCK_DATA } from './utils';
 
 const API_URL =
   'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/menu-items-by-category.json';
@@ -39,12 +39,20 @@ export default function App() {
   );
 
   const fetchData = async() => {
-    // 1. Implement this function
-    
-    // Fetch the menu from the API_URL endpoint. You can visit the API_URL in your browser to inspect the data returned
-    // The category field comes as an object with a property called "title". You just need to get the title value and set it under the key "category".
-    // So the server response should be slighly transformed in this function (hint: map function) to flatten out each menu item in the array,
-    return [];
+    try {
+      const response = await fetch(API_URL);
+      const json = await response.json();
+      const menu = json.menu.map((val) => {
+        const title = val.category.title
+        val.category = title
+        return val
+      });
+      console.log(menu);
+      return menu;
+    } catch (error) {
+      Alert.alert(e.message);
+      return []
+    }
   }
 
   useEffect(() => {
@@ -57,8 +65,11 @@ export default function App() {
         // and then stores it into a SQLite database.
         // After that, every application restart loads the menu from the database
         if (!menuItems.length) {
+          console.log('No data - refetching')
           const menuItems = await fetchData();
-          saveMenuItems(menuItems);
+          await saveMenuItems(menuItems);
+        } else {
+          console.log('Data found in db')
         }
 
         const sectionListData = getSectionListData(menuItems);
@@ -71,7 +82,9 @@ export default function App() {
   }, []);
 
   useUpdateEffect(() => {
+    
     (async () => {
+      console.log('updating!')
       const activeCategories = sections.filter((s, i) => {
         // If all filters are deselected, all categories are active
         if (filterSelections.every((item) => item === false)) {
@@ -104,6 +117,7 @@ export default function App() {
   };
 
   const handleFiltersChange = async (index) => {
+    console.log('filtering')
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
     setFilterSelections(arrayCopy);

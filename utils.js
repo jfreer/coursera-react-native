@@ -40,11 +40,35 @@ export const SECTION_LIST_MOCK_DATA = [
  * @see https://reactnative.dev/docs/sectionlist as a reference
  */
 export function getSectionListData(data) {
+  if (data && data[0].data) {
+    return SECTION_LIST_MOCK_DATA
+  }
+
+  function onlyUnique(value, index, array) {
+    return array.indexOf(value) === index;
+  }
+
+  const menus = {}
+  //const menu = data.map(x => x.category).filter(onlyUnique).map(x => ({ title: x, data: []}))
+  data.forEach(val => {
+     if (!menus[val.category]) {
+       menus[val.category] = {
+         title: val.category,
+         data: []
+       }
+     }
+     menus[val.category] = {
+       title: val.category,
+       data: menus[val.category].data.concat({id: val.id, title: val.title, price: val.price})
+     }
+  })
+  const menu = Object.values(menus)
+  console.log('Data', menu)
   // SECTION_LIST_MOCK_DATA is an example of the data structure you need to return from this function.
   // The title of each section should be the category.
   // The data property should contain an array of menu items. 
   // Each item has the following properties: "id", "title" and "price"
-  return SECTION_LIST_MOCK_DATA;
+  return menu;
 }
 
 export function useUpdateEffect(effect, dependencies = []) {
@@ -56,5 +80,5 @@ export function useUpdateEffect(effect, dependencies = []) {
     } else {
       return effect();
     }
-  }, dependencies);
+  }, [...dependencies, effect]);
 }

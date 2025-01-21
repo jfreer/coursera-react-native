@@ -1,38 +1,40 @@
 import * as SQLite from 'expo-sqlite';
 import { SECTION_LIST_MOCK_DATA } from './utils';
 
-const db = SQLite.openDatabase('little_lemon');
+const db = SQLite.openDatabaseSync('little_lemon');
 
 export async function createTable() {
-  return new Promise((resolve, reject) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
+  return await db.execAsync(
           'create table if not exists menuitems (id integer primary key not null, uuid text, title text, price text, category text);'
-        );
-      },
-      reject,
-      resolve
-    );
-  });
+  )
 }
 
 export async function getMenuItems() {
-  return new Promise((resolve) => {
-    db.transaction((tx) => {
-      tx.executeSql('select * from menuitems', [], (_, { rows }) => {
-        resolve(rows._array);
-      });
-    });
-  });
+  try {
+    const x = await db.getAllAsync('select * from menuitems')
+    console.log('x',x)
+    return x
+  } catch (error) {
+    Alert.alert(e.message);
+    return []
+  }
 }
 
-export function saveMenuItems(menuItems) {
-  db.transaction((tx) => {
-    // 2. Implement a single SQL statement to save all menu data in a table called menuitems.
-    // Check the createTable() function above to see all the different columns the table has
-    // Hint: You need a SQL statement to insert multiple rows at once.
-  });
+export async function saveMenuItems(menuItems) {
+  console.log('c', menuItems)
+  //return []
+  const statement = await db.prepareAsync(
+  'INSERT INTO menuitems (uuid, title, price, category) VALUES ($uuid, $title, $price, $category)'
+);
+try {
+  for (let i =0; i< menuItems.length; i++) {
+    const val = menuItems[i]
+await statement.executeAsync({ $uuid: val.id, $title: val.title, $price: val.price, $category: val.category });
+  }
+
+} finally {
+  await statement.finalizeAsync();
+}
 }
 
 /**
@@ -56,7 +58,9 @@ export function saveMenuItems(menuItems) {
  *
  */
 export async function filterByQueryAndCategories(query, activeCategories) {
-  return new Promise((resolve, reject) => {
-    resolve(SECTION_LIST_MOCK_DATA);
-  });
+  const cats = [...activeCategories].join("','")
+  console.log(cats)
+  const data = await db.getAllAsync(`select * from menuitems where category in ('${cats}')`)// AND title like '%?%'`, query)
+  console.log('filter', data)
+  return data
 }
