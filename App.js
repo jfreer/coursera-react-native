@@ -66,7 +66,7 @@ export default function App() {
         // After that, every application restart loads the menu from the database
         if (!menuItems.length) {
           console.log('No data - refetching')
-          const menuItems = await fetchData();
+          menuItems = await fetchData();
           await saveMenuItems(menuItems);
         } else {
           console.log('Data found in db')
@@ -112,12 +112,13 @@ export default function App() {
   const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
 
   const handleSearchChange = (text) => {
+    console.log('handleSearchChange')
     setSearchBarText(text);
     debouncedLookup(text);
   };
 
   const handleFiltersChange = async (index) => {
-    console.log('filtering')
+    console.log('handleFiltersChange')
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
     setFilterSelections(arrayCopy);
